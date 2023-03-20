@@ -1,4 +1,4 @@
-const express = require('express');
+import * as express from 'express'
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
@@ -17,13 +17,13 @@ const product = mongoose.model('product', productSchema);
 const app = express();
 app.use(bodyParser.json());
 
-// Connect to MongoDB
+// Connecting to MongoDB Database  
 mongoose.connect('mongodb://localhost/Ineuron'
 )
   .then(() => console.log('Connected to Database'))
   .catch(error => console.error(error));
 
-// Define CRUD routes
+// Defining All routes
 
 // Get all Product_items 
 app.get('/items', async (req, res) => {
@@ -63,7 +63,8 @@ app.post('/items', async (req, res) => {
           return res.status(404).json({ error: 'Email Already Exist...' });
         } 
     const savedItem = await newItem.save();
-    res.json(savedItem);
+    
+    return res.status(200).json(savedItem);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -77,8 +78,8 @@ app.put('/items/:email', async (req, res) => {
         const email = req.params.email
         const updatedproduct =  await product.findOne({ email }).exec();
         if (!updatedproduct) {
-          // Email non-exist 
-          res.status(404).json({ error: 'Email not found' });
+          // if Email non-exist 
+          return res.status(400).json({ error: 'Email not found' });
         } else {
             // Update product fields with new data
             updatedproduct.pname = req.body.pname || updatedproduct.pname;
@@ -86,7 +87,8 @@ app.put('/items/:email', async (req, res) => {
             updatedproduct.brand  = req.body.brand || updatedproduct.brand
             updatedproduct.price =  req.body.price || updatedproduct.price 
             const newproduct = await updatedproduct.save();
-            res.json(newproduct);
+            return res.status(200).json(newproduct);
+            
           }
     
       } catch (error) {
@@ -101,11 +103,12 @@ app.delete('/items/:email', async (req, res) => {
     try {
         const emailExist =  await product.findOne({ email }).exec();
         if (!emailExist) {
-          // Email non-exist 
-          return res.status(404).json({ error: 'Email not found' });
+          // If Email non-exist 
+          return res.status(400).json({ error: 'Email not found' });
         }
         const item = await product.deleteOne({email})
-        res.json(item);
+      
+       return res.status(500).json(item);
 
   } catch (error) {
     console.error(error);
@@ -114,6 +117,8 @@ app.delete('/items/:email', async (req, res) => {
 });
 
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
   console.log('Server started on port 3000');
 });
+
+module.exports = server

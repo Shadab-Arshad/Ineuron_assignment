@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,8 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
-var express = require('express');
+exports.__esModule = true;
+var express = require("express");
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 // Product schema
@@ -49,12 +50,12 @@ var productSchema = new mongoose.Schema({
 var product = mongoose.model('product', productSchema);
 var app = express();
 app.use(bodyParser.json());
-// Connect to MongoDB
+// Connecting to MongoDB Database  
 mongoose.connect('mongodb://localhost/Ineuron')
     .then(function () { return console.log('Connected to Database'); })["catch"](function (error) { return console.error(error); });
-// Define CRUD routes
+// Defining All routes
 // Get all Product_items 
-app.get('/items', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app.get('/items', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var items, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -75,7 +76,7 @@ app.get('/items', function (req, res) { return __awaiter(_this, void 0, void 0, 
     });
 }); });
 // Get an Product_items  by email
-app.get('/items/:email', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app.get('/items/:email', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var email, item, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -104,7 +105,7 @@ app.get('/items/:email', function (req, res) { return __awaiter(_this, void 0, v
     });
 }); });
 // Add a new Product_item
-app.post('/items', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app.post('/items', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var newItem, email, user, savedItem, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -124,8 +125,7 @@ app.post('/items', function (req, res) { return __awaiter(_this, void 0, void 0,
                 return [4 /*yield*/, newItem.save()];
             case 3:
                 savedItem = _a.sent();
-                res.json(savedItem);
-                return [3 /*break*/, 5];
+                return [2 /*return*/, res.status(200).json(savedItem)];
             case 4:
                 error_3 = _a.sent();
                 console.error(error_3);
@@ -136,7 +136,7 @@ app.post('/items', function (req, res) { return __awaiter(_this, void 0, void 0,
     });
 }); });
 // Update an Product_items by email
-app.put('/items/:email', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app.put('/items/:email', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var email, updatedproduct, newproduct, error_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -147,9 +147,8 @@ app.put('/items/:email', function (req, res) { return __awaiter(_this, void 0, v
             case 1:
                 updatedproduct = _a.sent();
                 if (!!updatedproduct) return [3 /*break*/, 2];
-                // Email non-exist 
-                res.status(404).json({ error: 'Email not found' });
-                return [3 /*break*/, 4];
+                // if Email non-exist 
+                return [2 /*return*/, res.status(400).json({ error: 'Email not found' })];
             case 2:
                 // Update product fields with new data
                 updatedproduct.pname = req.body.pname || updatedproduct.pname;
@@ -159,8 +158,7 @@ app.put('/items/:email', function (req, res) { return __awaiter(_this, void 0, v
                 return [4 /*yield*/, updatedproduct.save()];
             case 3:
                 newproduct = _a.sent();
-                res.json(newproduct);
-                _a.label = 4;
+                return [2 /*return*/, res.status(200).json(newproduct)];
             case 4: return [3 /*break*/, 6];
             case 5:
                 error_4 = _a.sent();
@@ -172,7 +170,7 @@ app.put('/items/:email', function (req, res) { return __awaiter(_this, void 0, v
     });
 }); });
 // Delete Product_items by email
-app["delete"]('/items/:email', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app["delete"]('/items/:email', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var email, emailExist, item, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -185,14 +183,13 @@ app["delete"]('/items/:email', function (req, res) { return __awaiter(_this, voi
             case 2:
                 emailExist = _a.sent();
                 if (!emailExist) {
-                    // Email non-exist 
-                    return [2 /*return*/, res.status(404).json({ error: 'Email not found' })];
+                    // If Email non-exist 
+                    return [2 /*return*/, res.status(400).json({ error: 'Email not found' })];
                 }
                 return [4 /*yield*/, product.deleteOne({ email: email })];
             case 3:
                 item = _a.sent();
-                res.json(item);
-                return [3 /*break*/, 5];
+                return [2 /*return*/, res.status(500).json(item)];
             case 4:
                 error_5 = _a.sent();
                 console.error(error_5);
@@ -202,6 +199,7 @@ app["delete"]('/items/:email', function (req, res) { return __awaiter(_this, voi
         }
     });
 }); });
-app.listen(3000, function () {
+var server = app.listen(3000, function () {
     console.log('Server started on port 3000');
 });
+module.exports = server;
